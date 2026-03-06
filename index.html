@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,user-scalable=no"/>
+<meta name="theme-color" content="#c8a96e"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="ThePlug"/>
+<link rel="manifest" href="manifest.json"/>
+<title>The Plug 🔌</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#0a0a0a;color:#f0ece4;font-family:'DM Sans',sans-serif;}
+
+/* ── SHELL ── */
+#shell{position:fixed;inset:0;display:flex;flex-direction:column;}
+#topbar{flex-shrink:0;height:54px;background:#0d0d08;border-bottom:1px solid #2a2010;display:flex;align-items:center;justify-content:space-between;padding:0 16px;}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#f0ece4;}
+.logo em{color:#c8a96e;font-style:normal;}
+.sv-btn{background:#1e1a0a;border:1px solid #2a2010;color:#c8a96e;border-radius:50px;padding:6px 14px;font-size:12px;cursor:pointer;}
+.sv-btn.on{background:#c8a96e;color:#0a0a0a;font-weight:600;}
+#main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:68px;}
+
+/* ── HERO ── */
+.hero{padding:22px 16px 10px;text-align:center;background:radial-gradient(ellipse at 50% 0%,#221508,transparent 70%);}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(30px,9vw,54px);font-weight:900;line-height:.9;letter-spacing:-1px;}
+.hero h1 em{color:#c8a96e;font-style:normal;}
+.hero p{font-size:10px;color:#5a4a30;margin-top:7px;letter-spacing:3px;text-transform:uppercase;}
+.sbox{position:relative;margin:10px 16px 0;}
+.sbox input{width:100%;padding:13px 16px 13px 40px;background:#161208;border:1px solid #2a2010;border-radius:50px;color:#f0ece4;font-size:15px;outline:none;}
+.sbox input:focus{border-color:#c8a96e;}
+.sbox span{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.35;font-size:15px;}
+.arow{display:flex;gap:8px;padding:10px 16px 0;}
+.bg{flex:1;padding:11px 0;border-radius:50px;background:#c8a96e;color:#0a0a0a;font-weight:600;font-size:13px;border:none;cursor:pointer;}
+.bo{flex:1;padding:11px 0;border-radius:50px;background:transparent;color:#c8a96e;font-size:13px;border:1px solid #c8a96e50;cursor:pointer;}
+.slbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a2a10;padding:11px 16px 5px;}
+.prow{display:flex;gap:5px;padding:0 16px;overflow-x:auto;scrollbar-width:none;}
+.prow::-webkit-scrollbar{display:none;}
+.pill{flex-shrink:0;padding:6px 13px;border-radius:50px;border:1px solid #2a2010;background:transparent;color:#7a6a50;font-size:11px;cursor:pointer;white-space:nowrap;}
+.pill.on{background:#c8a96e;border-color:#c8a96e;color:#0a0a0a;font-weight:600;}
+.cnt{font-size:11px;color:#3a2a10;padding:8px 16px 4px;}
+
+/* ── GRID ── */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:4px 12px 16px;}
+@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr);}}
+.card{background:#111008;border:1px solid #1e1a0a;border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .15s,border-color .2s;animation:fu .35s ease both;}
+.card:active{transform:scale(.96);}
+.card:hover{border-color:#c8a96e40;}
+@keyframes fu{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.ctop{height:88px;background:linear-gradient(135deg,#161208,#1e1608);display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;}
+.cbadge{position:absolute;top:6px;left:6px;font-size:8px;font-weight:700;letter-spacing:.5px;padding:2px 6px;border-radius:50px;text-transform:uppercase;}
+.bh{background:#c8a96e;color:#0a0a0a;}.ba{background:#6e8cc8;color:#fff;}.bu{background:#6ec89a;color:#0a0a0a;}
+.csave{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:#000a;border:1px solid #3a2a10;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.cbody{padding:9px 10px 11px;}
+.cvibe{font-size:8px;color:#c8a96e;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.cname{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#f0ece4;line-height:1.2;margin-bottom:3px;}
+.cdesc{font-size:10px;color:#6a5a40;line-height:1.4;margin-bottom:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.cfoot{display:flex;justify-content:space-between;}
+.cloc{font-size:9px;color:#3a2a10;}
+.crat{font-size:10px;color:#c8a96e;font-weight:600;}
+.empty{text-align:center;padding:50px 20px;grid-column:1/-1;}
+.empty .ei{font-size:36px;margin-bottom:9px;}
+.empty .et{font-family:'Playfair Display',serif;font-size:17px;color:#7a6a50;margin-bottom:5px;}
+.empty .es{font-size:11px;color:#3a2a10;}
+
+/* ── BOTTOM NAV ── */
+#bnav{position:fixed;bottom:0;left:0;right:0;height:60px;background:#0a0a0af8;border-top:1px solid #1e1a0a;display:flex;justify-content:space-around;align-items:center;padding-bottom:env(safe-area-inset-bottom);z-index:50;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:0 12px;}
+.ni .ico{font-size:20px;}
+.ni .lbl{font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:#3a2a10;}
+.ni.on .lbl{color:#c8a96e;}
+.ni.on .ico{transform:scale(1.1);}
+
+/* ══════════════════════════════════════
+   DETAIL — full screen, slides up
+   Info is FIRST. Buttons are LAST.
+══════════════════════════════════════ */
+#det{
+  position:fixed;inset:0;z-index:200;
+  background:#0a0a0a;
+  display:none;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .28s cubic-bezier(.32,.72,0,1);
+}
+#det.open{display:flex;transform:translateY(0);}
+
+/* Det top bar */
+#det-bar{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;height:52px;
+  background:#0d0d08;border-bottom:1px solid #2a2010;
+}
+#det-back{background:#1e1a0a;border:1px solid #2a2010;color:#c8a96e;border-radius:50px;padding:6px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;}
+#det-savebtn{background:transparent;border:1px solid #2a2010;color:#c8a96e;border-radius:50px;padding:6px 14px;font-size:13px;cursor:pointer;}
+#det-savebtn.on{background:#c8a96e;color:#0a0a0a;font-weight:600;}
+
+/* Det scroll — ALL content inside */
+#det-scroll{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* ── VENUE HEADER (top of scroll, always visible) ── */
+#det-head{
+  padding:20px 16px 16px;
+  background:linear-gradient(160deg,#141008,#0a0a0a);
+  border-bottom:1px solid #1e1a0a;
+}
+#det-emoji{font-size:52px;margin-bottom:10px;display:block;}
+#det-vibe{font-size:9px;color:#c8a96e;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+#det-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#f0ece4;line-height:1.05;margin-bottom:8px;}
+#det-desc{font-size:14px;color:#8a7a60;line-height:1.55;margin-bottom:14px;}
+#det-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{background:#1a1408;border:1px solid #2a2010;border-radius:50px;padding:5px 12px;font-size:11px;color:#a09070;}
+
+/* ── INFO BLOCKS ── */
+#det-info{padding:16px 16px 4px;}
+.sec{margin-bottom:20px;}
+.sec-t{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a2a10;margin-bottom:9px;}
+.irow{display:flex;align-items:flex-start;gap:10px;background:#111008;border:1px solid #1e1a0a;border-radius:11px;padding:12px 13px;margin-bottom:7px;font-size:13px;color:#9a8060;line-height:1.5;}
+.irow .iico{flex-shrink:0;font-size:16px;}
+.hrow{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px;font-size:13px;color:#9a8060;line-height:1.45;}
+.hdot{color:#c8a96e;flex-shrink:0;font-size:14px;}
+.factbox{background:#111008;border-left:3px solid #c8a96e;border-radius:0 11px 11px 0;padding:13px 14px;font-size:13px;color:#9a8060;line-height:1.55;}
+.tipbox{background:#111008;border:1px solid #2a2010;border-radius:11px;padding:13px 14px;font-size:13px;color:#6a5a40;line-height:1.55;}
+
+/* ── ACTION BUTTONS (at the BOTTOM) ── */
+#det-btns{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  padding:16px 16px 28px;
+  border-top:1px solid #1e1a0a;
+}
+.dlink{
+  padding:14px 10px;border-radius:13px;
+  border:1px solid #2a2010;background:#111008;
+  color:#a09070;font-size:13px;
+  text-decoration:none;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  cursor:pointer;
+}
+.dlink:active{opacity:.75;}
+.dlink.gold{background:#c8a96e;color:#0a0a0a;font-weight:600;border-color:#c8a96e;}
+
+/* ── MODALS ── */
+.mov{position:fixed;inset:0;background:#000c;z-index:300;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px);}
+.mov.open{display:flex;}
+.mbox{background:#111008;border:1px solid #2a2010;border-radius:20px 20px 0 0;padding:22px 16px 32px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;animation:mup .28s ease;}
+@keyframes mup{from{transform:translateY(60px);opacity:0;}to{transform:none;opacity:1;}}
+.mbox h2{font-family:'Playfair Display',serif;font-size:20px;color:#f0ece4;margin-bottom:3px;}
+.mbox p{font-size:11px;color:#5a4a30;margin-bottom:14px;}
+.mi{width:100%;padding:12px 13px;background:#0a0a0a;border:1px solid #2a2010;border-radius:10px;color:#f0ece4;font-size:14px;outline:none;margin-bottom:8px;}
+.mi:focus{border-color:#c8a96e;}
+.ms{width:100%;padding:12px 13px;background:#0a0a0a;border:1px solid #2a2010;border-radius:10px;color:#f0ece4;font-size:14px;outline:none;margin-bottom:8px;}
+.mr{display:flex;gap:8px;}
+.mr .mi,.mr .ms{flex:1;}
+.mac{display:flex;gap:8px;margin-top:6px;}
+.aicard{background:#0a0a0a;border:1px solid #2a2010;border-radius:10px;padding:11px;margin-bottom:7px;display:flex;gap:9px;}
+.aiem{font-size:22px;flex-shrink:0;}
+.ainm{font-family:'Playfair Display',serif;font-size:13px;color:#f0ece4;margin-bottom:2px;}
+.aids{font-size:10px;color:#5a4a30;}
+.ailc{font-size:10px;color:#c8a96e;margin-top:2px;}
+.succ{text-align:center;padding:16px 0;}
+.succ .si{font-size:44px;margin-bottom:8px;}
+.succ .st{font-family:'Playfair Display',serif;font-size:20px;color:#c8a96e;}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div id="topbar">
+    <div class="logo">The<em>Plug</em> 🇿🇦</div>
+    <button class="sv-btn" id="sv-btn" onclick="toggleSaved()">🔖 Saved</button>
+  </div>
+  <div id="main">
+    <div class="hero" id="hero-section">
+      <h1>Find Your<br/><em>Vibe</em></h1>
+      <p id="vc">Loading...</p>
+    </div>
+    <div class="sbox" id="search-section">
+      <span>🔍</span>
+      <input id="search" placeholder="Search venues, cities, vibes..." oninput="render()"/>
+    </div>
+    <div class="arow" id="act-section">
+      <button class="bg" onclick="openAI()">✨ AI Discover</button>
+      <button class="bo" onclick="openSub()">➕ Add Venue</button>
+    </div>
+    <div class="slbl" id="aud-lbl">Who are you?</div>
+    <div class="prow" id="aud-row">
+      <button class="pill" onclick="setAud(this,'locals')">🏠 Locals</button>
+      <button class="pill" onclick="setAud(this,'tourists')">✈️ Tourists</button>
+      <button class="pill" onclick="setAud(this,'events')">🎪 Events</button>
+      <button class="pill" onclick="setAud(this,'business')">🏢 Business</button>
+    </div>
+    <div class="slbl" id="prov-lbl">Province</div>
+    <div class="prow" id="prov-row"></div>
+    <div class="slbl" id="vibe-lbl">Vibe</div>
+    <div class="prow" id="vibe-row"></div>
+    <div class="cnt" id="cnt"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+  <div id="bnav">
+    <div class="ni on" id="n-disc" onclick="showDiscover()"><div class="ico">🔌</div><div class="lbl">Discover</div></div>
+    <div class="ni" id="n-save" onclick="toggleSaved()"><div class="ico">🔖</div><div class="lbl">Saved</div></div>
+    <div class="ni" onclick="openAI()"><div class="ico">✨</div><div class="lbl">AI Find</div></div>
+    <div class="ni" onclick="openSub()"><div class="ico">➕</div><div class="lbl">Add</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     DETAIL PANEL
+     ORDER: Back bar → Venue info → Action buttons
+     Everything visible immediately, no scrolling needed for info
+═══════════════════════════════════ -->
+<div id="det">
+
+  <!-- 1. TOP BAR -->
+  <div id="det-bar">
+    <button id="det-back" onclick="closeDet()">← Back</button>
+    <button id="det-savebtn" onclick="toggleSaveDet()">🤍 Save</button>
+  </div>
+
+  <div id="det-scroll">
+
+    <!-- 2. VENUE HEADER — name, description, chips — FIRST THING SEEN -->
+    <div id="det-head">
+      <span id="det-emoji"></span>
+      <div id="det-vibe"></div>
+      <div id="det-name"></div>
+      <div id="det-desc"></div>
+      <div id="det-chips"></div>
+    </div>
+
+    <!-- 3. INFO — highlights, fact, tip -->
+    <div id="det-info"></div>
+
+    <!-- 4. ACTION BUTTONS — LAST, after all info -->
+    <div id="det-btns"></div>
+
+  </div>
+</div>
+
+<!-- AI MODAL -->
+<div class="mov" id="ai-modal" onclick="if(event.target===this)closeAI()">
+  <div class="mbox">
+    <h2>✨ AI Discover</h2>
+    <p>Describe what you want — AI finds real SA venues</p>
+    <input class="mi" id="ai-q" placeholder="e.g. rooftop bars Cape Town, spa Joburg..." onkeydown="if(event.key==='Enter')runAI()"/>
+    <div class="mac">
+      <button class="bg" id="ai-btn" style="border:none;cursor:pointer;" onclick="runAI()">🔍 Find Venues</button>
+      <button class="bo" style="cursor:pointer;" onclick="closeAI()">Cancel</button>
+    </div>
+    <div id="ai-err" style="color:#c86e6e;font-size:11px;margin-top:8px;display:none;"></div>
+    <div id="ai-res"></div>
+  </div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="mov" id="sub-modal" onclick="if(event.target===this)closeSub()">
+  <div class="mbox">
+    <div id="sub-form">
+      <h2>➕ Add a Venue</h2>
+      <p>Know a spot that deserves to be on The Plug?</p>
+      <input class="mi" id="s-name" placeholder="Venue name *"/>
+      <div class="mr">
+        <input class="mi" id="s-city" placeholder="City *"/>
+        <select class="ms" id="s-prov"></select>
+      </div>
+      <select class="ms" id="s-vibe"></select>
+      <input class="mi" id="s-desc" placeholder="Description *"/>
+      <input class="mi" id="s-hours" placeholder="Opening hours"/>
+      <input class="mi" id="s-price" placeholder="Price range"/>
+      <input class="mi" id="s-phone" placeholder="Phone (optional)"/>
+      <input class="mi" id="s-web" placeholder="Website (optional)"/>
+      <input class="mi" id="s-rating" placeholder="Rating e.g. 4.5"/>
+      <div class="mac">
+        <button class="bg" style="border:none;cursor:pointer;" onclick="submitV()">Submit</button>
+        <button class="bo" style="cursor:pointer;" onclick="closeSub()">Cancel</button>
+      </div>
+    </div>
+    <div class="succ" id="sub-ok" style="display:none">
+      <div class="si">🎉</div><div class="st">Venue Added!</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const PROVINCES=["All","Gauteng","Western Cape","KwaZulu-Natal","Eastern Cape","Limpopo","Mpumalanga","North West","Free State","Northern Cape"];
+const VIBES=["All","🍸 Nightlife","🍽️ Restaurants","☕ Cafés","🎨 Arts & Culture","🌿 Outdoors","🏋️ Wellness","🎶 Live Music","🛍️ Shopping","🏨 Hotels","🎭 Entertainment"];
+
+const VENUES=[
+  {id:1,name:"Maboneng Precinct",province:"Gauteng",city:"Johannesburg",vibe:"🎨 Arts & Culture",description:"Joburg's creative hub with galleries, markets, street food and weekend flea markets. The heartbeat of urban cool in Jozi.",rating:4.7,img:"🏙️",hot:true,tags:["locals","tourists"],hours:"Daily 10am–10pm",price:"Free entry · Food from R50",phone:"011 026 1970",web:"http://www.maboneng.com",highlights:["Weekend Arts on Main flea market","Over 30 galleries and studios","Rooftop bars with Joburg skyline views","Street art walking tours available"],fact:"Maboneng means 'place of light' in Sesotho — it transformed a derelict industrial area into SA's most creative neighbourhood.",tip:"Visit on a Sunday for Market on Main — arrive before 11am to beat the crowds."},
+  {id:2,name:"The Grillhouse Rosebank",province:"Gauteng",city:"Johannesburg",vibe:"🍽️ Restaurants",description:"One of Joburg's most celebrated steakhouses — dry-aged beef, exceptional wine lists and impeccable service for 30+ years.",rating:4.5,img:"🥩",hot:false,tags:["locals","business","tourists"],hours:"Mon–Sat 12pm–10:30pm · Sun 12pm–9pm",price:"R300–R800 per person",phone:"011 880 3945",web:"https://thegrillhouse.co.za",highlights:["Award-winning dry-aged steaks","600+ label wine cellar","Private dining rooms for business","Consistently rated SA's best steakhouse"],fact:"The Grillhouse has dry-aged its own beef on-site for over 30 years — a genuine rarity in South Africa.",tip:"Book at least a week ahead for weekends. Ask for a booth seat for the best experience."},
+  {id:3,name:"Taboo Nightclub",province:"Gauteng",city:"Johannesburg",vibe:"🍸 Nightlife",description:"Sandton's most exclusive nightclub — celebrity-frequented with world-class sound systems and resident DJs every weekend.",rating:4.4,img:"🎉",hot:true,tags:["locals","events"],hours:"Thu–Sat 9pm–4am",price:"R200–R500 entry",phone:"011 784 6000",web:"",highlights:["World-class DJ lineup every weekend","VIP bottle service available","Strict dress code enforced","Multiple themed rooms"],fact:"Taboo has hosted international acts including Black Coffee, DJ Fresh and numerous international artists on SA tours.",tip:"Dress well — shorts and sneakers will be turned away. Arrive after 11pm when it gets properly lively."},
+  {id:4,name:"Neighbourgoods Market",province:"Gauteng",city:"Johannesburg",vibe:"🛍️ Shopping",description:"Joburg's most iconic Saturday market in Braamfontein — artisan food, local designers, coffee, vinyl and great vibes.",rating:4.6,img:"🛒",hot:false,tags:["locals","tourists"],hours:"Saturdays only · 9am–3pm",price:"Free entry",phone:"",web:"http://neighbourgoodsmarket.co.za",highlights:["100+ artisan food and craft vendors","Fresh local produce and gourmet street food","Vintage clothing and local designer stalls","Live DJ sets and relaxed atmosphere"],fact:"The market started in Cape Town in 2007 and expanded to Joburg's Braamfontein in 2011 — now one of the city's most-loved institutions.",tip:"Bring cash — many vendors don't have card machines. Go early as popular stalls sell out by noon."},
+  {id:5,name:"Gold Reef City",province:"Gauteng",city:"Johannesburg",vibe:"🎭 Entertainment",description:"A theme park on a real gold mine — rides, casino and fascinating gold rush history all in one day out.",rating:4.3,img:"🎢",hot:false,tags:["tourists","events"],hours:"Wed–Sun 9:30am–5pm",price:"R200–R320 per person",phone:"011 248 6800",web:"https://goldreefcity.co.za",highlights:["Descend into a real 19th century gold mine","Rollercoasters and family rides","Casino and entertainment complex","Gold pouring demonstrations"],fact:"The mine shaft goes 220 metres underground and was part of Crown Mines — once the world's richest gold mine.",tip:"Go midweek to avoid weekend crowds. The mine tour is the highlight — do not skip it."},
+  {id:6,name:"Vilakazi Street",province:"Gauteng",city:"Soweto",vibe:"🎨 Arts & Culture",description:"The only street in the world to have housed two Nobel Peace Prize winners — Nelson Mandela and Archbishop Desmond Tutu.",rating:4.8,img:"🏘️",hot:true,tags:["tourists","locals"],hours:"Hector Pieterson Museum: Mon–Sat 10am–5pm",price:"Museum R70 · Street is free",phone:"",web:"",highlights:["Nelson Mandela's former home — now a museum","Hector Pieterson Memorial Museum","Vibrant shebeens and restaurants","Regular cultural walking tours"],fact:"Mandela lived at No. 8115 Vilakazi Street before his imprisonment. The street is named after poet Benedict Wallet Vilakazi.",tip:"Join a guided Soweto tour — local guides bring the history alive in ways no museum can match."},
+  {id:7,name:"Montecasino",province:"Gauteng",city:"Johannesburg",vibe:"🎭 Entertainment",description:"Joburg's most popular entertainment precinct — a stunning Italian village replica with theatre, casino, 50+ restaurants and cinemas.",rating:4.5,img:"🎰",hot:false,tags:["events","business","tourists"],hours:"Casino: 24hrs · Shops: 9am–9pm",price:"Free entry to precinct",phone:"011 510 7000",web:"https://montecasino.co.za",highlights:["Teatro — SA's largest theatre venue","50+ restaurants and bars","Bird Gardens with exotic birds","Regular live shows and comedy nights"],fact:"Montecasino's painted ceiling mimics dawn, day, dusk and night convincingly — many first-time visitors don't realise they're indoors.",tip:"Check what's on at Teatro before you go — booking shows in advance saves money and guarantees seats."},
+  {id:8,name:"Pretoria Botanical Garden",province:"Gauteng",city:"Pretoria",vibe:"🌿 Outdoors",description:"76 hectares of beautiful indigenous gardens showcasing all of SA's diverse plant biomes — peaceful and breathtaking.",rating:4.7,img:"🌸",hot:false,tags:["locals","tourists"],hours:"Daily 8am–6pm",price:"R100 adults · R20 children",phone:"012 843 5000",web:"https://sanbi.org.za",highlights:["76 hectares of indigenous SA plants","Summer outdoor concerts and picnics","Over 240 bird species recorded","One of the world's finest cycad collections"],fact:"The garden contains cycad plants over 200 years old — part of one of the world's most important cycad collections.",tip:"Bring a picnic and enjoy the summer concert series held here. Wear comfortable shoes for walking."},
+  {id:9,name:"Union Buildings",province:"Gauteng",city:"Pretoria",vibe:"🎨 Arts & Culture",description:"SA's magnificent seat of government — a Herbert Baker masterpiece with terraced gardens overlooking the Jacaranda city.",rating:4.6,img:"🏛️",hot:false,tags:["tourists"],hours:"Gardens open daily 7am–6pm",price:"Free",phone:"",web:"",highlights:["Nelson Mandela statue at the entrance","Panoramic views over Pretoria","Jacaranda-lined terraced gardens","Site of Mandela's 1994 inauguration"],fact:"Designed by Sir Herbert Baker in 1910, the buildings face north — unusual in the Southern Hemisphere.",tip:"Visit in October–November when the jacaranda trees are in full purple bloom — one of SA's most beautiful sights."},
+  {id:10,name:"Soweto Wine Festival",province:"Gauteng",city:"Soweto",vibe:"🎶 Live Music",description:"SA's most unique wine festival — held annually in the heart of Soweto with live music, 100+ estates and real township energy.",rating:4.7,img:"🍷",hot:true,tags:["locals","events","tourists"],hours:"Annual event — usually August",price:"R250–R350 per person",phone:"",web:"",highlights:["100+ wine estates represented","Live performances by top SA artists","Township food and craft stalls","15,000+ visitors attend annually"],fact:"Started in 2004 to make wine culture accessible to all South Africans — it now draws over 15,000 visitors each year.",tip:"Buy tickets in advance — it sells out every year. Friday evening has the best live music lineup."},
+  {id:11,name:"Truth Coffee Roasting",province:"Western Cape",city:"Cape Town",vibe:"☕ Cafés",description:"A jaw-dropping steampunk café crowned the world's best coffee shop — the in-house roastery, incredible coffee and legendary breakfasts.",rating:4.8,img:"☕",hot:true,tags:["locals","tourists","business"],hours:"Mon–Fri 7am–6pm · Sat 8am–5pm · Sun 9am–2pm",price:"R40–R120 per person",phone:"021 200 0440",web:"https://truthcoffee.com",highlights:["Named world's best coffee shop by The Guardian","Spectacular steampunk interior design","In-house coffee roastery visible from tables","Full breakfast and brunch menu all day"],fact:"Truth roasts all its coffee on-site in a vintage 1920s Probat roasting machine — it's central to the entire steampunk aesthetic.",tip:"Queues get long on weekends. Visit on a weekday morning for the best experience and to actually get a seat."},
+  {id:12,name:"Shimmy Beach Club",province:"Western Cape",city:"Cape Town",vibe:"🍸 Nightlife",description:"Cape Town's premier waterfront beach club — daytime pool parties become legendary sunset sessions and late-night events.",rating:4.6,img:"🏖️",hot:true,tags:["locals","tourists","events"],hours:"Tue–Sun 12pm–late",price:"R100–R300 entry (events vary)",phone:"021 200 7778",web:"https://shimmybeach.co.za",highlights:["Private beach and pool on the V&A Waterfront","World-renowned DJ events","Restaurant and cocktail bar","Table Mountain views from the beach"],fact:"Shimmy created Cape Town's first private urban beach by dredging a section of the V&A Waterfront harbour.",tip:"Their NYE party is legendary but sells out months ahead. Book a beach bed for the day on weekends."},
+  {id:13,name:"Boulders Beach Penguins",province:"Western Cape",city:"Simon's Town",vibe:"🌿 Outdoors",description:"Walk among 2,000+ African penguins on a pristine beach — one of the few places in the world to experience this.",rating:4.8,img:"🐧",hot:true,tags:["tourists"],hours:"Daily 8am–5pm (7:30am in summer)",price:"R200 adults · R100 children",phone:"",web:"https://sanparks.org",highlights:["2,000+ African penguins in natural habitat","Swimming beach right next to the colony","Boardwalk platforms into the colony","30 minutes from Cape Town CBD"],fact:"African penguins are endangered. This colony was established by just two breeding pairs in 1982 — it now has over 2,000 birds.",tip:"Go early morning (before 10am) for the best light for photos and fewer crowds. Penguins are most active early."},
+  {id:14,name:"Franschhoek Wine Tram",province:"Western Cape",city:"Franschhoek",vibe:"🍽️ Restaurants",description:"A unique hop-on hop-off tram through the wine valley — visit world-class estates, taste wines and enjoy gourmet food.",rating:4.7,img:"🍇",hot:true,tags:["tourists","locals","events"],hours:"Tue–Sun, various departure times",price:"R380–R450 per person",phone:"021 300 0992",web:"https://winetram.co.za",highlights:["Visit 4–6 wine estates per route","Panoramic Franschhoek Valley views","Gourmet food pairing options","Multiple routes to choose from"],fact:"The trams were launched in 2010 using refurbished 1920s carriages — some originally ran in Lisbon, Portugal.",tip:"Book online well in advance, especially for weekends. Take the Blue Route for the most scenic views."},
+  {id:15,name:"The Silo Hotel",province:"Western Cape",city:"Cape Town",vibe:"🏨 Hotels",description:"One of Africa's most spectacular hotels — a converted grain silo at the V&A Waterfront with glass bubble windows and stunning design.",rating:4.9,img:"🏗️",hot:true,tags:["tourists","business"],hours:"24 hours",price:"R12,000–R60,000 per night",phone:"021 670 0500",web:"https://thesilohotel.com",highlights:["Rooftop bar and pool with Table Mountain views","Home to the Zeitz MOCAA art museum","28 individually designed luxury suites","Africa's Leading Luxury Hotel award"],fact:"The Silo's extraordinary pixelated windows were made by inserting 6-metre glass bubbles into the original silo structure — each weighs over a tonne.",tip:"Even if you can't stay, visit the rooftop bar at sunset — bookings essential. Or visit Zeitz MOCAA downstairs for free."},
+  {id:16,name:"Cafe Caprice",province:"Western Cape",city:"Cape Town",vibe:"🍸 Nightlife",description:"Camps Bay's iconic beachfront bar — the place to be at sunset on Cape Town's most glamorous strip for over 30 years.",rating:4.5,img:"🌅",hot:false,tags:["locals","tourists"],hours:"Daily 9am–2am",price:"R200–R500 per person",phone:"021 438 8315",web:"https://cafecaprice.co.za",highlights:["Front-row seats to Camps Bay Beach","Famous sundowner cocktails","Weekend DJ sets","People-watching hotspot since 1993"],fact:"Cafe Caprice has been a Cape Town institution since 1993 and is frequently listed among Africa's most beautiful bars.",tip:"Grab an outside seat at least 45 minutes before sunset — it gets packed. The rosé and seafood platter is legendary."},
+  {id:17,name:"Stellenbosch Wine Route",province:"Western Cape",city:"Stellenbosch",vibe:"🍽️ Restaurants",description:"The mother of all wine routes — 150+ estates through scenic oak-lined streets in SA's wine capital, 45 minutes from Cape Town.",rating:4.8,img:"🍷",hot:true,tags:["tourists","events","business"],hours:"Most estates: Mon–Sat 9am–5pm",price:"Tasting fees R100–R300 per estate",phone:"",web:"https://wineroute.co.za",highlights:["150+ wine estates of different styles","Iconic estates: Spier, Tokara, Delaire Graff","World-class restaurants at many estates","Historic Cape Dutch architecture throughout"],fact:"Stellenbosch is SA's second oldest town (founded 1679) and produces some of the Southern Hemisphere's finest Cabernet Sauvignons.",tip:"Plan 3–4 estates maximum per day. Hire a designated driver or join an organised tour."},
+  {id:18,name:"Cango Caves",province:"Western Cape",city:"Oudtshoorn",vibe:"🌿 Outdoors",description:"One of the world's great cave systems — ancient underground chambers with 20-million-year-old stalactites and stalagmites.",rating:4.7,img:"🦇",hot:false,tags:["tourists"],hours:"Daily tours: 9am–4pm",price:"R215 heritage tour · R270 adventure tour",phone:"044 272 7410",web:"https://cangocaves.co.za",highlights:["Chambers up to 16 metres high","20-million-year-old formations","Adventure tour through narrow passages","Constant cool 18°C temperature inside"],fact:"The Cango Caves extend 5km underground but only 1km is open to visitors. The San people knew of them for thousands of years.",tip:"The Adventure Tour is worth the extra cost — crawling through the Tunnel of Love and Devil's Chimney is unforgettable."},
+  {id:19,name:"Moses Mabhida Stadium",province:"KwaZulu-Natal",city:"Durban",vibe:"🌿 Outdoors",description:"Durban's iconic 2010 World Cup stadium — take the SkyCar to the arch top or fly through it on the Big Rush Swing.",rating:4.7,img:"🏟️",hot:false,tags:["tourists","events"],hours:"Daily 9am–5pm",price:"SkyCar R100 · Big Rush Swing R695",phone:"031 582 8222",web:"https://mosesmabhidastadium.com",highlights:["SkyCar ride to the 106-metre arch peak","Big Rush Swing — world's tallest stadium swing","360° views of Durban and the Indian Ocean","Stadium tours on non-event days"],fact:"The arch is 350 metres long and splits into two legs that embrace the stadium — designed to represent SA's unity.",tip:"The sunset SkyCar ride is spectacular. Book in advance on weekends. The Big Rush Swing is terrifying in the best way."},
+  {id:20,name:"Florida Road",province:"KwaZulu-Natal",city:"Durban",vibe:"🍸 Nightlife",description:"Durban's most vibrant entertainment strip — a tree-lined road packed with restaurants, bars, clubs and live music every weekend.",rating:4.5,img:"🌴",hot:true,tags:["locals","tourists"],hours:"Restaurants from 11am · Bars from 5pm · Clubs from 10pm",price:"Varies by venue",phone:"",web:"",highlights:["30+ restaurants, bars and clubs","Buzzing on weekends year-round","Mix of upscale and casual venues","Famous for Durban's legendary curry restaurants"],fact:"Florida Road was once a quiet residential street — it transformed into Durban's entertainment hub in the 1990s and never looked back.",tip:"Start with dinner at a curry restaurant (Bean Bag Bohemia is iconic) then move to bars as the night progresses."},
+  {id:21,name:"uShaka Marine World",province:"KwaZulu-Natal",city:"Durban",vibe:"🎭 Entertainment",description:"Africa's largest marine theme park — home to sharks, rays, a water park, Durban beach and Africa's biggest aquarium.",rating:4.6,img:"🦈",hot:true,tags:["tourists"],hours:"Daily 9am–5pm",price:"R300–R460 per person",phone:"031 328 8000",web:"https://ushakamarineworld.co.za",highlights:["Africa's largest aquarium with 32 tanks","Shark dive experience available","Wet n Wild water park included","Daily dolphin and seal shows"],fact:"uShaka is built to look like a shipwreck — the aquarium is inside a replica of a sunken 1940s cargo ship called the Phantom Ship.",tip:"Arrive when it opens to beat school groups. The shark dive must be booked separately — it is one of SA's most thrilling experiences."},
+  {id:22,name:"Drakensberg Amphitheatre",province:"KwaZulu-Natal",city:"Royal Natal",vibe:"🌿 Outdoors",description:"One of the world's most dramatic rock faces — 5km wide and 1,200m high, with Tugela Falls (world's 2nd tallest) dropping from its top.",rating:4.9,img:"⛰️",hot:true,tags:["tourists","locals"],hours:"Royal Natal Park: daily 6am–6pm",price:"R232 conservation fee per day",phone:"036 438 6303",web:"https://sanparks.org",highlights:["Tugela Falls — world's second tallest waterfall at 948m","Hike to the top of the Amphitheatre","San rock art in nearby caves","Trout fishing and horse riding available"],fact:"The Tugela Falls freeze completely in winter, forming spectacular ice columns — one of SA's most extraordinary natural events.",tip:"The Tugela Gorge hike (3–4 hours return) is one of SA's best day hikes. Start early, wear proper shoes, bring water."},
+  {id:23,name:"Durban Indian Quarter",province:"KwaZulu-Natal",city:"Durban",vibe:"🍽️ Restaurants",description:"Durban has the largest Indian community outside India — explore Victoria Street Market for spices, curry and rich culture.",rating:4.7,img:"🌶️",hot:false,tags:["locals","tourists"],hours:"Market: Mon–Sat 6am–6pm · Sun 6am–2pm",price:"Food from R60",phone:"",web:"",highlights:["Victoria Street Market — spices, fabrics and crafts","Home of the legendary Durban curry","Authentic bunny chow tastings","Colourful temples throughout the quarter"],fact:"Indian indentured labourers arrived in Durban from 1860, bringing spices and recipes that created SA's unique curry culture.",tip:"Don't leave without trying an authentic bunny chow (curry in a half-loaf of bread) — try it at Britannia Hotel where it was invented."},
+  {id:24,name:"Hluhluwe-iMfolozi Park",province:"KwaZulu-Natal",city:"Hluhluwe",vibe:"🌿 Outdoors",description:"Africa's oldest proclaimed game reserve — established 1895, home to the Big 5 and world-famous white rhino conservation.",rating:4.8,img:"🦏",hot:false,tags:["tourists"],hours:"Oct–Mar: 5am–7pm · Apr–Sep: 6am–6pm",price:"R232 adults per day",phone:"035 562 0848",web:"https://sanparks.org",highlights:["Africa's oldest proclaimed nature reserve","World's largest white rhino population","Big 5 game viewing","Self-drive and guided drives available"],fact:"Hluhluwe-iMfolozi saved the white rhino from extinction in the 1950s — Operation Rhino relocated hundreds of rhinos to establish new populations worldwide.",tip:"Game viewing is best in winter (June–August) when animals gather at water holes. Predator sightings peak at dawn."},
+  {id:25,name:"Addo Elephant Park",province:"Eastern Cape",city:"Addo",vibe:"🌿 Outdoors",description:"SA's third-largest national park — home to 600+ elephants, one of the highest concentrations of elephants on Earth.",rating:4.9,img:"🐘",hot:true,tags:["tourists"],hours:"Daily 7am–7pm",price:"R216 adults per day",phone:"042 233 8600",web:"https://sanparks.org",highlights:["600+ African elephants — almost guaranteed sighting","Big 7: Big 5 plus great white shark and whale","Night game drives available","Marine section with whale and penguin watching"],fact:"Addo had only 11 elephants left in 1931. Today its 600+ represent one of conservation's greatest success stories.",tip:"Position yourself at the main camp waterhole at dusk — you will often see 50+ elephants come to drink at once."},
+  {id:26,name:"Hogsback",province:"Eastern Cape",city:"Hogsback",vibe:"🌿 Outdoors",description:"A magical mountain village in the Amathole Mountains — misty forests, waterfalls, fairy gardens and total tranquillity.",rating:4.8,img:"🌲",hot:false,tags:["locals","tourists"],hours:"Always accessible",price:"Free to explore · Accommodation from R600",phone:"",web:"",highlights:["20+ forest waterfalls within hiking distance","Tolkien is said to have been inspired by this landscape","Fairy forest trails and enchanted gardens","Star-gazing away from city lights"],fact:"J.R.R. Tolkien's father was born near Hogsback — many believe the area's misty forests and rolling hills inspired Middle Earth.",tip:"Stay at least 2 nights to properly explore the waterfalls. Visit the Edge waterfall at sunset for breathtaking views."},
+  {id:27,name:"Chintsa Beach",province:"Eastern Cape",city:"Chintsa",vibe:"🌿 Outdoors",description:"One of SA's most unspoilt beaches on the Wild Coast — pristine sand, no vendors, no crowds, just pure ocean and nature.",rating:4.7,img:"🏄",hot:false,tags:["tourists","locals"],hours:"Always accessible",price:"Free",phone:"",web:"",highlights:["Completely undeveloped beach stretching for miles","Excellent surfing waves","Dolphins visible year-round","Traditional Xhosa villages nearby"],fact:"The Wild Coast remains one of the last undeveloped stretches of coastline in South Africa, protected by communal land ownership.",tip:"Bring everything you need — no shops or facilities on the beach. Stay at Buccaneers Backpackers for the best Wild Coast experience."},
+  {id:28,name:"Kruger National Park",province:"Limpopo",city:"Phalaborwa",vibe:"🌿 Outdoors",description:"Africa's most iconic game reserve — 20,000km² of bushveld with more wildlife species than anywhere on Earth.",rating:4.9,img:"🦁",hot:true,tags:["tourists","locals"],hours:"Oct–Mar: 5:30am–6:30pm · Apr–Sep: 6am–6pm",price:"R372 adults per day",phone:"013 735 4000",web:"https://sanparks.org",highlights:["Big 5 all regularly sighted","Over 500 bird species","Self-drive or guided safaris","24 camps from luxury lodges to camping"],fact:"Kruger is larger than Israel and home to 148 mammal species, 507 bird species and 336 tree species — more than anywhere else in Africa.",tip:"Self-drive in winter (June–August) for the best game viewing. Skukuza camp is central and great for first-timers."},
+  {id:29,name:"Mapungubwe National Park",province:"Limpopo",city:"Alldays",vibe:"🎨 Arts & Culture",description:"A UNESCO World Heritage Site — ruins of southern Africa's first kingdom and birthplace of the legendary golden rhino.",rating:4.8,img:"🦏",hot:false,tags:["tourists"],hours:"Daily 7am–6pm",price:"R232 adults",phone:"015 534 7923",web:"https://sanparks.org",highlights:["UNESCO World Heritage Site","The golden rhino — symbol of SA's ancient civilisation","Big 5 game reserve surrounding the heritage site","Confluence of the Limpopo and Shashe rivers"],fact:"The Mapungubwe kingdom (1220–1290 AD) was southern Africa's first sophisticated state — it established SA's earliest known class system.",tip:"Book accommodation well in advance. The interpretive centre is world-class and absolutely essential viewing."},
+  {id:30,name:"Tzaneen Tea Estates",province:"Limpopo",city:"Tzaneen",vibe:"🌿 Outdoors",description:"Rolling green tea plantations in the lush, subtropical Letaba Valley — SA's most unexpected green paradise.",rating:4.5,img:"🍵",hot:false,tags:["locals","tourists"],hours:"Sapekoe Tea Estate tours: Mon–Fri 9am–3pm",price:"Tours from R150",phone:"015 276 4980",web:"",highlights:["Rolling hills of tea plantations","Tea tasting experiences","Waterfalls and hiking trails","Subtropical forest scenic drives"],fact:"Tzaneen's Sapekoe Tea Estate has grown tea since the 1960s in soils remarkably similar to those in Sri Lanka.",tip:"Visit after summer rains (January–March) when the tea is brightest green. Combine with a drive through Magoebaskloof Pass."},
+  {id:31,name:"Blyde River Canyon",province:"Mpumalanga",city:"Graskop",vibe:"🌿 Outdoors",description:"The third largest canyon on Earth and the largest green canyon in the world — extraordinary viewpoints along the Panorama Route.",rating:4.9,img:"🏞️",hot:true,tags:["tourists","locals"],hours:"Always accessible · Bourke's Luck: 7am–5pm",price:"Free most viewpoints · Bourke's Luck R160",phone:"",web:"",highlights:["Three Rondavels — the iconic SA image","God's Window — views over the lowveld","Bourke's Luck Potholes geological wonder","Blyde River Dam boat cruises"],fact:"The canyon is 26km long and up to 750m deep yet stays lush and green year-round due to high rainfall from the Indian Ocean.",tip:"Drive the full Panorama Route (R532) from God's Window to Bourke's Luck Potholes. Allow a full day. Bring a raincoat."},
+  {id:32,name:"Mac Mac Pools",province:"Mpumalanga",city:"Sabie",vibe:"🌿 Outdoors",description:"Crystal clear natural swimming pools fed by the Mac Mac waterfall in the Sabie forest — a perfect Mpumalanga stop.",rating:4.6,img:"💧",hot:false,tags:["locals","tourists"],hours:"Daily 8am–5pm",price:"R48 adults",phone:"",web:"",highlights:["Natural rock swimming pools","Mac Mac Falls viewpoint nearby","Picnic areas in indigenous forest","Short forest walks"],fact:"Mac Mac Pools got their name from the many Scottish miners (names beginning with 'Mac') who mined gold here in the 1870s.",tip:"Visit on a weekday — it gets very busy with locals on weekends. Bring a towel and your own food."},
+  {id:33,name:"Graskop Gorge Lift",province:"Mpumalanga",city:"Graskop",vibe:"🎭 Entertainment",description:"A transparent glass lift descends 51 metres into an ancient gorge, followed by a boardwalk through lush indigenous forest.",rating:4.7,img:"🛗",hot:true,tags:["tourists"],hours:"Daily 9am–4:30pm",price:"R250 adults · R120 children",phone:"013 767 1141",web:"https://graskopgorge.co.za",highlights:["Glass-sided lift drops into the gorge","Canopy walkway through indigenous forest","Big Swing over the gorge available","Swimming hole at the bottom"],fact:"The lift took 2 years to build, requiring engineers to drill through solid ancient rock.",tip:"Combine with the Big Swing for maximum adrenaline. Book online to guarantee entry during school holidays."},
+  {id:34,name:"Bourke's Luck Potholes",province:"Mpumalanga",city:"Moremela",vibe:"🌿 Outdoors",description:"Extraordinary cylindrical potholes carved into gold-coloured rock by swirling water over millions of years — surreal and beautiful.",rating:4.7,img:"🌀",hot:false,tags:["tourists","locals"],hours:"Daily 7am–5pm",price:"R160 adults",phone:"013 769 6019",web:"",highlights:["Unique geological formations","Confluence of the Blyde and Treur rivers","Walking bridges over the potholes","Photography viewpoints throughout"],fact:"Named after Tom Bourke who predicted gold at the river confluence. He was wrong about gold but the formations are priceless.",tip:"Go in the morning when light hits the gold-coloured rocks. Allow 45 minutes to 1 hour."},
+  {id:35,name:"Sun City Resort",province:"North West",city:"Sun City",vibe:"🍸 Nightlife",description:"SA's legendary entertainment destination — casino, water park, golf courses, luxury hotels and world-class concerts all in one.",rating:4.7,img:"🎰",hot:true,tags:["tourists","events","business"],hours:"24 hours",price:"Day visitor entry R150 · Activities from R200",phone:"014 557 1000",web:"https://suncity.co.za",highlights:["The Palace of the Lost City — one of Africa's best hotels","Valley of Waves water park","Gary Player Championship golf courses","Regular big-name concert events"],fact:"Queen, Frank Sinatra and Rod Stewart all performed at Sun City during its iconic early years in the 1980s.",tip:"Valley of Waves is excellent for families. Non-hotel guests can buy day visitor passes. Book well ahead for holidays."},
+  {id:36,name:"Pilanesberg Game Reserve",province:"North West",city:"Pilanesberg",vibe:"🌿 Outdoors",description:"Malaria-free Big 5 game reserve inside an ancient volcanic crater — just 2 hours from Joburg, perfect for a weekend safari.",rating:4.8,img:"🦏",hot:false,tags:["tourists","locals"],hours:"Oct–Mar: 5:30am–7pm · Apr–Sep: 6am–6:30pm",price:"R220 adults per day",phone:"014 555 1600",web:"https://pilanesberggamereserve.com",highlights:["Big 5 in a malaria-free zone","Unique volcanic crater landscape","2 hours from Johannesburg","Night drives and bush walks available"],fact:"Pilanesberg sits inside a 1.2-billion-year-old volcanic ring — one of only three such structures on Earth. Animals were re-introduced in Operation Genesis in the 1970s.",tip:"Self-drive on good roads — great game viewing. The Mankwe Dam hide at dawn is excellent for predator sightings."},
+  {id:37,name:"Hartbeespoort Dam",province:"North West",city:"Hartbeespoort",vibe:"🌿 Outdoors",description:"Joburg's most popular weekend escape — cable car rides, boat trips, animal sanctuaries and waterfront restaurants.",rating:4.4,img:"⛵",hot:false,tags:["locals"],hours:"Cableway: daily 9am–5pm",price:"Cable car R195 · Boat trips from R150",phone:"",web:"",highlights:["Aerial cableway with panoramic views","Hartbeespoort Dam boat cruises","Aquila animal sanctuary nearby","Numerous waterfront restaurants and markets"],fact:"The dam wall was completed in 1925. The name means 'Pass of the Hartebeest' in Afrikaans — named after the antelope that once roamed freely here.",tip:"Avoid public holidays — it gets extremely crowded. Weekday visits are far more enjoyable. The cableway is the highlight."},
+  {id:38,name:"Clarens Art Town",province:"Free State",city:"Clarens",vibe:"🎨 Arts & Culture",description:"SA's 'Jewel of the Free State' — a quaint sandstone village packed with galleries, craft beer, great food and mountain air.",rating:4.7,img:"🎨",hot:true,tags:["locals","tourists"],hours:"Shops and galleries: daily 9am–5pm",price:"Free to explore",phone:"",web:"https://clarens.co.za",highlights:["Clarens Craft Brewery — award-winning beers","30+ art galleries and studios","Golden Gate Highlands Park 15 minutes away","Mountain biking and hiking trails"],fact:"Clarens was established in 1912 and named after the town in Switzerland where President Paul Kruger died in exile in 1904.",tip:"Visit during the Clarens Craft Beer Festival (March annually) — it draws 10,000+ visitors. Book accommodation months ahead."},
+  {id:39,name:"Golden Gate Highlands Park",province:"Free State",city:"Clarens",vibe:"🌿 Outdoors",description:"Dramatic golden sandstone cliffs that glow amber and orange at sunset — one of SA's most photogenic national parks.",rating:4.8,img:"🏜️",hot:false,tags:["tourists","locals"],hours:"Daily 7am–6pm",price:"R232 adults per day",phone:"058 255 0011",web:"https://sanparks.org",highlights:["Brandwag Buttress — the iconic golden rock formation","San rock art within the park","Eland, baboon and black wildebeest","Excellent hiking and horse trails"],fact:"The park gets its name from the way afternoon sunlight strikes the yellow, orange and red sandstone — the glow changes colour throughout the day.",tip:"Late afternoon is the best time for the golden light. Position yourself at Brandwag for sunset. Combine with Clarens village."},
+  {id:40,name:"Oliewenhuis Art Museum",province:"Free State",city:"Bloemfontein",vibe:"🎨 Arts & Culture",description:"A magnificent art museum in a Cape Dutch manor house with a world-class SA art collection and beautiful sculpture garden.",rating:4.5,img:"🏛️",hot:false,tags:["tourists","locals"],hours:"Mon–Fri 8am–5pm · Sat 10am–5pm · Sun 1pm–5pm",price:"Free entry",phone:"051 447 9609",web:"",highlights:["Extensive South African art collection","Beautiful sculpture garden","Historic Cape Dutch manor house","Regular temporary exhibitions"],fact:"Oliewenhuis means 'olive-tree house' in Afrikaans — it was the official residence of the Orange Free State governors before becoming a museum in 1979.",tip:"The sculpture garden is beautiful and peaceful. Free entry makes this one of SA's best value cultural experiences."},
+  {id:41,name:"Augrabies Falls",province:"Northern Cape",city:"Augrabies",vibe:"🌿 Outdoors",description:"The Orange River thunders 56 metres into a narrow granite gorge — one of the world's great waterfalls, especially in flood.",rating:4.8,img:"🌊",hot:false,tags:["tourists"],hours:"Daily 7am–7pm",price:"R232 adults",phone:"054 452 9200",web:"https://sanparks.org",highlights:["56-metre waterfall — 6th largest in the world","Viewing platforms over the gorge","Quiver tree forest walks","Night drives for nocturnal wildlife"],fact:"Augrabies is a Khoikhoi word meaning 'place of great noise' — when in flood, the roar of the falls can be heard from kilometres away.",tip:"The falls are most dramatic January–March after summer rains swell the Orange River. The 3-day hiking trail is exceptional."},
+  {id:42,name:"Sutherland Stargazing",province:"Northern Cape",city:"Sutherland",vibe:"🎨 Arts & Culture",description:"The clearest skies in Africa — home to SALT, the Southern Hemisphere's largest telescope, and extraordinary dark-sky stargazing.",rating:4.9,img:"🔭",hot:true,tags:["tourists","locals"],hours:"SALT tours: Fri–Sat evenings only",price:"R100–R200",phone:"023 571 2436",web:"https://saao.ac.za",highlights:["SALT — the largest optical telescope in the Southern Hemisphere","Among the darkest skies on Earth","Temperatures can drop to -10°C in winter","SA Astronomical Observatory guided tours"],fact:"Sutherland's skies rank among the world's top 3 clearest for astronomy. SALT's mirror is 11 metres across.",tip:"Book the observatory tour months in advance — it sells out. Bring extremely warm clothes even in summer. The Milky Way is naked-eye visible."},
+  {id:43,name:"Namaqualand Wildflowers",province:"Northern Cape",city:"Springbok",vibe:"🌿 Outdoors",description:"One of nature's greatest spectacles — from August to September the arid desert explodes into millions of wildflowers.",rating:4.9,img:"🌼",hot:true,tags:["tourists"],hours:"Always accessible · Peak: August–September",price:"Free",phone:"",web:"",highlights:["Millions of flowers covering hundreds of kilometres","Over 4,000 plant species — 30% found nowhere else on Earth","Richtersveld dramatic moonscape beyond the flowers","Goegap Nature Reserve for concentrated flower viewing"],fact:"Namaqualand receives less than 150mm of rain annually yet produces one of the most extraordinary floral displays on Earth.",tip:"Peak bloom is usually mid-August to mid-September. Follow @flowersonfield on Instagram for real-time bloom reports."},
+  {id:44,name:"Kgalagadi Transfrontier Park",province:"Northern Cape",city:"Upington",vibe:"🌿 Outdoors",description:"Red sand dunes, vast open skies, black-maned Kalahari lions and some of Africa's most dramatic star-filled nights.",rating:4.9,img:"🦁",hot:true,tags:["tourists","locals"],hours:"Oct–Mar: 5:30am–7:30pm · Apr–Sep: 7am–6pm",price:"R372 adults (foreigners) · R76 (SA residents)",phone:"054 561 2000",web:"https://sanparks.org",highlights:["Famous black-maned Kalahari lions","Sociable weavers enormous colonial nests","Gemsbok, cheetah and raptor sightings","Some of Africa's most remote wilderness"],fact:"The Kgalagadi's black-maned lions are genetically distinct — the dark mane is an adaptation to colder Kalahari nights.",tip:"Kalahari nights are cold — bring sleeping bags even in summer. Drive the Auob and Nossob river roads where animals concentrate."},
+];
+
+// ── STATE ──
+let allV=[...VENUES], nId=VENUES.length+1, saved=[], selP='All', selVibe='All', selA=null, isSaved=false, aId=null;
+try{saved=JSON.parse(localStorage.getItem('tp_s'))||[];}catch{}
+try{const ex=JSON.parse(localStorage.getItem('tp_ex'))||[];allV=[...VENUES,...ex];nId=allV.reduce((m,v)=>Math.max(m,v.id),0)+1;}catch{}
+
+function save(){try{localStorage.setItem('tp_s',JSON.stringify(saved));}catch{}try{localStorage.setItem('tp_ex',JSON.stringify(allV.filter(v=>v.id>VENUES.length)));}catch{}}
+
+// ── FILTER PILLS ──
+function buildPills(){
+  const pr=document.getElementById('prov-row'),vr=document.getElementById('vibe-row');
+  pr.innerHTML='';vr.innerHTML='';
+  PROVINCES.forEach(p=>{const b=document.createElement('button');b.className='pill'+(p===selP?' on':'');b.textContent=p;b.onclick=()=>{selP=p;buildPills();render();};pr.appendChild(b);});
+  VIBES.forEach(v=>{const b=document.createElement('button');b.className='pill'+(v===selVibe?' on':'');b.textContent=v;b.onclick=()=>{selVibe=v;buildPills();render();};vr.appendChild(b);});
+  const sp=document.getElementById('s-prov'),sv=document.getElementById('s-vibe');
+  if(!sp.options.length){
+    PROVINCES.filter(p=>p!=='All').forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;sp.appendChild(o);});
+    VIBES.filter(v=>v!=='All').forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sv.appendChild(o);});
+  }
+}
+
+function setAud(btn,a){
+  if(selA===a){selA=null;btn.classList.remove('on');}
+  else{document.querySelectorAll('#aud-row .pill').forEach(b=>b.classList.remove('on'));selA=a;btn.classList.add('on');}
+  render();
+}
+
+// ── RENDER ──
+function render(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const g=document.getElementById('grid');g.innerHTML='';
+  document.getElementById('vc').textContent=`${allV.length} Venues · 9 Provinces`;
+  let list=isSaved?allV.filter(v=>saved.includes(v.id)):allV.filter(v=>{
+    if(selP!=='All'&&v.province!==selP)return false;
+    if(selVibe!=='All'&&v.vibe!==selVibe)return false;
+    if(selA&&!(v.tags||[]).includes(selA))return false;
+    if(q&&!v.name.toLowerCase().includes(q)&&!v.city.toLowerCase().includes(q)&&!v.description.toLowerCase().includes(q))return false;
+    return true;
+  });
+  document.getElementById('cnt').textContent=isSaved?`${list.length} saved venue${list.length!==1?'s':''}`:
+    `${list.length} spot${list.length!==1?'s':''} ${selP!=='All'?'in '+selP:'across South Africa'}${selA?' · '+selA:''}`;
+  if(!list.length){g.innerHTML=`<div class="empty"><div class="ei">${isSaved?'🔖':'🔍'}</div><div class="et">${isSaved?'Nothing saved yet':'No spots found'}</div><div class="es">${isSaved?'Tap 🤍 to save venues':'Try adjusting filters or AI Discover'}</div></div>`;return;}
+  list.forEach((v,i)=>{
+    const el=document.createElement('div');el.className='card';el.style.animationDelay=`${Math.min(i,10)*28}ms`;
+    const sv2=saved.includes(v.id);
+    el.innerHTML=`<div class="ctop"><span>${v.img}</span>${v.isAI?'<div class="cbadge ba">✨</div>':v.isUser?'<div class="cbadge bu">👤</div>':v.hot?'<div class="cbadge bh">🔥</div>':''}<button class="csave" data-id="${v.id}">${sv2?'🔖':'🤍'}</button></div><div class="cbody"><div class="cvibe">${v.vibe}</div><div class="cname">${v.name}</div><div class="cdesc">${v.description}</div><div class="cfoot"><span class="cloc">📍 ${v.city}</span><span class="crat">⭐ ${Number(v.rating).toFixed(1)}</span></div></div>`;
+    el.querySelector('.csave').addEventListener('click',e=>{e.stopPropagation();toggleSaveId(v.id);});
+    el.addEventListener('click',()=>openDet(v.id));
+    g.appendChild(el);
+  });
+}
+
+// ── SAVE ──
+function toggleSaveId(id){saved.includes(id)?saved=saved.filter(x=>x!==id):saved.push(id);save();render();if(aId===id)updateSaveBtn();}
+function toggleSaveDet(){toggleSaveId(aId);}
+function updateSaveBtn(){const b=document.getElementById('det-savebtn');if(saved.includes(aId)){b.textContent='🔖 Saved';b.classList.add('on');}else{b.textContent='🤍 Save';b.classList.remove('on');}}
+
+// ── DETAIL ──
+function openDet(id){
+  aId=id;
+  const v=allV.find(x=>x.id===id);
+  if(!v)return;
+
+  // Reset scroll to TOP immediately
+  const scroll=document.getElementById('det-scroll');
+  scroll.scrollTop=0;
+
+  // ── HEADER (shown first, no API needed) ──
+  document.getElementById('det-emoji').textContent=v.img;
+  document.getElementById('det-vibe').textContent=`${v.vibe} · ${v.province}`;
+  document.getElementById('det-name').textContent=v.name;
+  document.getElementById('det-desc').textContent=v.description;
+
+  // Chips row
+  let chips=`<span class="chip">⭐ ${Number(v.rating).toFixed(1)}</span><span class="chip">📍 ${v.city}</span>`;
+  if(v.hours)chips+=`<span class="chip">🕐 ${v.hours}</span>`;
+  if(v.price)chips+=`<span class="chip">💰 ${v.price}</span>`;
+  document.getElementById('det-chips').innerHTML=chips;
+
+  // ── INFO SECTION ──
+  let info='';
+
+  // Contact block
+  if(v.phone||v.web){
+    info+=`<div class="sec"><div class="sec-t">Contact</div>`;
+    if(v.phone)info+=`<div class="irow"><span class="iico">📞</span><a href="tel:${v.phone}" style="color:#c8a96e;text-decoration:none;">${v.phone}</a></div>`;
+    if(v.web)info+=`<div class="irow"><span class="iico">🌐</span><a href="${v.web}" target="_blank" style="color:#c8a96e;text-decoration:none;">${v.web}</a></div>`;
+    info+=`</div>`;
+  }
+
+  // Highlights
+  if(v.highlights&&v.highlights.length){
+    info+=`<div class="sec"><div class="sec-t">Highlights</div>`;
+    v.highlights.forEach(h=>{info+=`<div class="hrow"><span class="hdot">✦</span><span>${h}</span></div>`;});
+    info+=`</div>`;
+  }
+
+  // Fun fact
+  if(v.fact){
+    info+=`<div class="sec"><div class="sec-t">Did You Know?</div><div class="factbox">💡 ${v.fact}</div></div>`;
+  }
+
+  // Visitor tip
+  if(v.tip){
+    info+=`<div class="sec"><div class="sec-t">Visitor Tip</div><div class="tipbox">💬 ${v.tip}</div></div>`;
+  }
+
+  document.getElementById('det-info').innerHTML=info||'';
+
+  // ── ACTION BUTTONS (at the bottom) ──
+  const enc=s=>encodeURIComponent(s);
+  const q=`${v.name} ${v.city} South Africa`;
+  let btns=`<a class="dlink gold" href="https://www.youtube.com/results?search_query=${enc(q)}" target="_blank">▶ Watch Videos</a>`;
+  btns+=`<a class="dlink" href="https://www.google.com/maps/search/${enc(q)}" target="_blank">🗺️ Get Directions</a>`;
+  btns+=`<a class="dlink" href="https://www.google.com/search?q=${enc(q)}&tbm=isch" target="_blank">📸 More Photos</a>`;
+  if(v.web){btns+=`<a class="dlink" href="${v.web}" target="_blank">🌐 Visit Website</a>`;}
+  else{btns+=`<a class="dlink" href="https://www.google.com/search?q=${enc(q)}" target="_blank">🔎 Search Web</a>`;}
+  document.getElementById('det-btns').innerHTML=btns;
+
+  updateSaveBtn();
+
+  // Open the panel
+  const det=document.getElementById('det');
+  det.style.display='flex';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>det.classList.add('open')));
+}
+
+function closeDet(){
+  const det=document.getElementById('det');
+  det.classList.remove('open');
+  setTimeout(()=>{det.style.display='none';},300);
+  aId=null;
+}
+
+// ── TABS ──
+function showDiscover(){
+  isSaved=false;
+  document.getElementById('n-disc').classList.add('on');
+  document.getElementById('n-save').classList.remove('on');
+  document.getElementById('sv-btn').classList.remove('on');
+  document.getElementById('sv-btn').textContent='🔖 Saved';
+  ['hero-section','search-section','act-section','aud-lbl','aud-row','prov-lbl','prov-row','vibe-lbl','vibe-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
+  render();
+}
+function toggleSaved(){
+  if(isSaved){showDiscover();return;}
+  isSaved=true;
+  document.getElementById('n-save').classList.add('on');
+  document.getElementById('n-disc').classList.remove('on');
+  document.getElementById('sv-btn').classList.add('on');
+  document.getElementById('sv-btn').textContent=`🔖 ${saved.length} Saved`;
+  ['hero-section','search-section','act-section','aud-lbl','aud-row','prov-lbl','prov-row','vibe-lbl','vibe-row'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  render();
+}
+
+// ── AI ──
+function openAI(){document.getElementById('ai-modal').classList.add('open');}
+function closeAI(){document.getElementById('ai-modal').classList.remove('open');document.getElementById('ai-res').innerHTML='';document.getElementById('ai-q').value='';document.getElementById('ai-err').style.display='none';}
+async function runAI(){
+  const q=document.getElementById('ai-q').value.trim();if(!q)return;
+  const btn=document.getElementById('ai-btn');btn.textContent='🔍 Searching...';btn.disabled=true;
+  document.getElementById('ai-err').style.display='none';document.getElementById('ai-res').innerHTML='';
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:`SA travel expert. User wants: "${q}". Return ONLY a valid JSON array of 6 real SA venues. No markdown, no text outside the array.\n[{"name":"str","city":"str","province":"one of the 9 SA provinces","vibe":"one of [🍸 Nightlife,🍽️ Restaurants,☕ Cafés,🎨 Arts & Culture,🌿 Outdoors,🏋️ Wellness,🎶 Live Music,🛍️ Shopping,🏨 Hotels,🎭 Entertainment]","description":"one sentence","rating":4.5,"img":"emoji","hours":"opening hours","price":"price range","highlights":["h1","h2","h3"],"fact":"fun fact","tip":"visitor tip","tags":["locals","tourists"]}]`}]})});
+    const data=await res.json();
+    const txt=(data.content||[]).map(c=>c.text||'').join('');
+    const clean=txt.replace(/```json|```/g,'').trim();
+    const s=clean.indexOf('['),e=clean.lastIndexOf(']');
+    const list=JSON.parse(clean.slice(s,e+1));
+    let html=`<div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#3a2a10;margin:14px 0 9px">Found ${list.length} venues</div>`;
+    list.forEach(v=>{html+=`<div class="aicard"><div class="aiem">${v.img}</div><div><div class="ainm">${v.name}</div><div class="aids">${v.description}</div><div class="ailc">📍 ${v.city}, ${v.province} · ⭐ ${v.rating}</div></div></div>`;});
+    html+=`<button class="bg" id="addai" style="width:100%;border:none;padding:12px 0;border-radius:50px;margin-top:8px;cursor:pointer;font-size:13px;">➕ Add All to The Plug</button>`;
+    document.getElementById('ai-res').innerHTML=html;
+    document.getElementById('addai').onclick=()=>{list.forEach(v=>{allV.push({...v,id:nId++,hot:false,isAI:true,rating:parseFloat(v.rating)||4.0,highlights:v.highlights||[],fact:v.fact||'',tip:v.tip||''});});save();render();closeAI();};
+  }catch{document.getElementById('ai-err').textContent='Could not find venues. Try a different search.';document.getElementById('ai-err').style.display='block';}
+  btn.textContent='🔍 Find Venues';btn.disabled=false;
+}
+
+// ── SUBMIT ──
+function openSub(){document.getElementById('sub-modal').classList.add('open');}
+function closeSub(){document.getElementById('sub-modal').classList.remove('open');document.getElementById('sub-form').style.display='block';document.getElementById('sub-ok').style.display='none';}
+function submitV(){
+  const name=document.getElementById('s-name').value.trim(),city=document.getElementById('s-city').value.trim(),desc=document.getElementById('s-desc').value.trim();
+  if(!name||!city||!desc){alert('Please fill in name, city and description.');return;}
+  allV.push({id:nId++,name,city,description:desc,province:document.getElementById('s-prov').value,vibe:document.getElementById('s-vibe').value,hours:document.getElementById('s-hours').value,price:document.getElementById('s-price').value,phone:document.getElementById('s-phone').value,web:document.getElementById('s-web').value,rating:parseFloat(document.getElementById('s-rating').value)||4.0,img:'📍',hot:false,isUser:true,tags:['locals','tourists'],highlights:[],fact:'',tip:''});
+  save();render();
+  document.getElementById('sub-form').style.display='none';document.getElementById('sub-ok').style.display='block';
+  setTimeout(()=>{closeSub();['s-name','s-city','s-desc','s-hours','s-price','s-phone','s-web','s-rating'].forEach(id=>{document.getElementById(id).value='';});},1800);
+}
+
+// ── PWA ──
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ── INIT ──
+buildPills();render();
+</script>
+</body>
+</html>
